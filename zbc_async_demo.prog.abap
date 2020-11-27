@@ -40,7 +40,7 @@ CLASS lcl_task IMPLEMENTATION.
       WHEN OTHERS.
     ENDCASE.
 
-  ENDMETHOD.                    "start
+  ENDMETHOD.
 
   METHOD receive.
     FIELD-SYMBOLS:
@@ -51,8 +51,8 @@ CLASS lcl_task IMPLEMENTATION.
     RECEIVE RESULTS FROM FUNCTION 'ZSB_PARALELL_TEST'
       IMPORTING
         pid    = <ls_task>-pid.
-  ENDMETHOD.                    "receive
-ENDCLASS.                    "lcl_task IMPLEMENTATION
+  ENDMETHOD.
+ENDCLASS.
 
 FIELD-SYMBOLS:
   <ls_task> TYPE zcl_bc_async_controller=>ty_task.
