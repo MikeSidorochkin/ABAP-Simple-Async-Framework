@@ -1,11 +1,3 @@
-*&---------------------------------------------------------------------*
-*& Report  ZHR_ASYNC_DEMO
-*&
-*&---------------------------------------------------------------------*
-*&
-*&
-*&---------------------------------------------------------------------*
-
 REPORT  zbc_async_demo.
 
 TABLES: rzllitab.
@@ -90,12 +82,10 @@ FIELD-SYMBOLS:
 START-OF-SELECTION.
   GET TIME FIELD gv_start_time.
   TRY.
-      CREATE OBJECT go_controller
-        EXPORTING
-          it_server_groups = VALUE zsbt_d7737_server_group( ( p_s_grp ) )
-          iv_max_wps       = p_maxts " Maximum number of processes used (optional)
-          iv_max_percent   = p_perc  " Maximum load percentage (if iv_max_wps is not set)
-          iv_timeout       = p_tout. " Resource availability timeout
+      go_controller = NEW #( it_server_groups = VALUE zsbt_d7737_server_group( ( p_s_grp ) )
+                             iv_max_wps       = p_maxts   " Maximum number of processes used (optional)
+                             iv_max_percent   = p_perc    " Maximum load percentage (if iv_max_wps is not set)
+                             iv_timeout       = p_tout ). " Resource availability timeout
 
       DO p_calls TIMES.
         CREATE OBJECT go_task

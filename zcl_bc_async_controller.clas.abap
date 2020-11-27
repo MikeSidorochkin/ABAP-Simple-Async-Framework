@@ -240,7 +240,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
       CLEAR lr_task.
 
       IF mv_running_tasks >= mv_max_tasks AND mv_max_tasks IS NOT INITIAL.
-        WAIT UNTIL mv_running_tasks < mv_max_tasks.
+        WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_running_tasks < mv_max_tasks.
       ENDIF.
 
       lr_task = get_next_task( ).
@@ -257,7 +257,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           lv_started_tasks = lv_started_tasks + 1.
         CATCH zcx_bc_async_no_resources INTO lo_resource.
 
-          WAIT UNTIL mv_finished_tasks >= lv_started_tasks
+          WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_finished_tasks >= lv_started_tasks
                UP TO mv_task_timeout SECONDS.
 
           IF sy-subrc = 0.
@@ -281,7 +281,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
     ENDWHILE.
 
-    WAIT UNTIL mv_finished_tasks >= lv_started_tasks.
+    WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_finished_tasks >= lv_started_tasks.
   ENDMETHOD.                    "start
 
 
