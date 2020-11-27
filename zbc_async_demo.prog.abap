@@ -1,31 +1,14 @@
 REPORT  zbc_async_demo.
 
-TABLES: rzllitab.
-
 CLASS lcl_task DEFINITION INHERITING FROM zcl_bc_async_task_base.
   PROTECTED SECTION.
     METHODS:
       start REDEFINITION,
       receive REDEFINITION.
-ENDCLASS.                    "lcl_task DEFINITION
-
-DATA:
-  go_controller TYPE REF TO zcl_bc_async_controller,
-  gt_tasks      TYPE zcl_bc_async_controller=>tt_tasks,
-  go_task       TYPE REF TO lcl_task,
-  gv_inc        TYPE i,
-  gv_text       TYPE string,
-  go_exception  TYPE REF TO zcx_bc_async_base.
-
-DATA:
-  gv_start_time TYPE sy-uzeit,
-  gv_end_time   TYPE sy-uzeit,
-  gv_diff       TYPE sy-uzeit.
+ENDCLASS.
 
 PARAMETERS:
-  p_s_grp TYPE rzllitab-classname DEFAULT 'parallel_generators' MATCHCODE OBJECT spta_server_group,
-  p_tout  TYPE i DEFAULT 60,
-  p_maxts TYPE i DEFAULT 0,
+  p_s_grp TYPE rzlli_apcl DEFAULT 'parallel_generators' MATCHCODE OBJECT spta_server_group,
   p_perc  TYPE i DEFAULT 75.
 
 SELECTION-SCREEN: SKIP.
@@ -35,17 +18,14 @@ PARAMETERS:
 
 CLASS lcl_task IMPLEMENTATION.
   METHOD start.
-
-    DATA lv_message TYPE msgv1.
-
     " Starting a new task
     CALL FUNCTION 'ZSB_PARALELL_TEST'
       STARTING NEW TASK mv_task_name
       DESTINATION IN GROUP mv_server_group
       CALLING receive_internal ON END OF TASK
       EXCEPTIONS
-        communication_failure = 1 MESSAGE lv_message
-        system_failure        = 2 MESSAGE lv_message
+        communication_failure = 1
+        system_failure        = 2
         resource_failure      = 3
         OTHERS                = 4.
 
@@ -59,8 +39,6 @@ CLASS lcl_task IMPLEMENTATION.
             textid = zcx_bc_async_no_resources=>rfc_start_error.
       WHEN OTHERS.
     ENDCASE.
-
-    gv_inc = gv_inc + 1.
 
   ENDMETHOD.                    "start
 
@@ -80,40 +58,35 @@ FIELD-SYMBOLS:
   <ls_task> TYPE zcl_bc_async_controller=>ty_task.
 
 START-OF-SELECTION.
-  GET TIME FIELD gv_start_time.
+  DATA(go_timer) = cl_abap_runtime=>create_hr_timer( ).
+  DATA(gv_start_time) = go_timer->get_runtime( ).
+
   TRY.
-      go_controller = NEW #( it_server_groups = VALUE zsbt_d7737_server_group( ( p_s_grp ) )
-                             iv_max_wps       = p_maxts   " Maximum number of processes used (optional)
-                             iv_max_percent   = p_perc    " Maximum load percentage (if iv_max_wps is not set)
-                             iv_timeout       = p_tout ). " Resource availability timeout
+      DATA(go_controller) = NEW zcl_bc_async_controller( it_server_groups = VALUE zsbt_d7737_server_group( ( p_s_grp ) )
+                                                         iv_max_percent   = p_perc ).
 
       DO p_calls TIMES.
-        CREATE OBJECT go_task
-          EXPORTING
-            io_controller = go_controller
-            iv_name       = |{ sy-index }|.
-
-        go_controller->add_task( go_task ).
+        go_controller->add_task( NEW lcl_task( io_controller = go_controller
+                                               iv_name       = |{ sy-index }| ) ).
       ENDDO.
 
       go_controller->start( ).
-    CATCH zcx_bc_async_base INTO go_exception.
-      gv_text = go_exception->get_text( ).
-      WRITE gv_text.
+    CATCH zcx_bc_async_base INTO DATA(go_exception).
+      WRITE go_exception->get_text( ).
       STOP.
   ENDTRY.
 
-  gt_tasks = go_controller->get_tasks( ).
+  DATA(gt_tasks) = go_controller->get_tasks( ).
 
-  WRITE: / 'Processes started: ', gv_inc.
+  WRITE: / 'Processes started: ', p_calls.
   ULINE.
 
   LOOP AT gt_tasks ASSIGNING <ls_task>.
-    WRITE: / 'Task name: ', <ls_task>-name(5), 'PID: ', <ls_task>-pid,  ' Start time: ', <ls_task>-start_time, ' End time: ' , <ls_task>-end_time,
-             'Attempts: ', <ls_task>-count.
+    WRITE: / 'Task name: ',   <ls_task>-name(5),
+             'PID: ',         <ls_task>-pid,
+             'Start time: ',  <ls_task>-start_time,
+             'End time: ' ,   <ls_task>-end_time.
   ENDLOOP.
 
-  GET TIME FIELD gv_end_time.
-  gv_diff = gv_end_time - gv_start_time.
   ULINE.
-  WRITE: /(50) 'Total time', gv_diff.
+  WRITE: /(50) 'Total time (sec)', |{ ( go_timer->get_runtime( ) - gv_start_time ) / 1000000 }|.
