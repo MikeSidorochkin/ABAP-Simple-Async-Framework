@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_CLAS" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <VSEOCLASS>
+    <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+    <LANGU>E</LANGU>
+    <DESCRIPT>Управление асинхронными вызовами</DESCRIPT>
+    <STATE>1</STATE>
+    <CLSCCINCL>X</CLSCCINCL>
+    <FIXPT>X</FIXPT>
+    <UNICODE>X</UNICODE>
+   </VSEOCLASS>
+   <TPOOL>
+    <item>
+     <ID>I</ID>
+     <KEY>001</KEY>
+     <ENTRY>Ошибка выделения ресурсов</ENTRY>
+     <LENGTH>34</LENGTH>
+    </item>
+   </TPOOL>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>ADD_TASK</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Добавить задачу</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>CLEAR_TASKS</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Очистка списка задач</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>CONSTRUCTOR</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Инициализация</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>GET_GROUP</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Получение группы серверов</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>GET_NEXT_TASK</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Получение следующей для выполнения задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>GET_TASKS</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Получить обработанные задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MT_TASKS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Список задач</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MT_TASKS</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Список задач</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_FINISHED_TASKS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Завершенные задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_FINISHED_TASKS</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Завершенные задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_MAX_ATTEMPTS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Максимальное значение попыток получения ресурсов для задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_MAX_ATTEMPTS</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Максимальное значение попыток получения ресурсов для задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_MAX_TASKS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Максимальное число задействованных процессов</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_MAX_TASKS</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Максимальное число задействованных процессов</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_RUNNING_TASKS</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Работающие задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_RUNNING_TASKS</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Работающие задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_SERVER_GROUP</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Logon/Server Group Name</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_SERVER_GROUP</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Logon/Server Group Name</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_TASK_TIMEOUT</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Время ожидания задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>MV_TASK_TIMEOUT</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Время ожидания задачи</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>START</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Запуск выполнения задач</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BC_ASYNC_CONTROLLER</CLSNAME>
+     <CMPNAME>TASK_COMPLETE</CMPNAME>
+     <LANGU>R</LANGU>
+     <DESCRIPT>Обработка завершения задачи</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
+  </asx:values>
+ </asx:abap>
+</abapGit>
