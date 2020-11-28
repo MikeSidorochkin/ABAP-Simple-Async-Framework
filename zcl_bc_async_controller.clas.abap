@@ -3,17 +3,17 @@
 *----------------------------------------------------------------------*
 *
 *----------------------------------------------------------------------*
-class ZCL_BC_ASYNC_CONTROLLER definition
-  public
-  final
-  create public
+CLASS zcl_bc_async_controller DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC
 
-  global friends ZCL_BC_ASYNC_TASK_BASE .
+  GLOBAL FRIENDS zcl_bc_async_task_base .
 
-public section.
+  PUBLIC SECTION.
 
-  types:
-    BEGIN OF ty_task,
+    TYPES:
+      BEGIN OF ty_task,
         task       TYPE REF TO zcl_bc_async_task_base,
         name       TYPE guid_32,
         start_time TYPE t,
@@ -23,52 +23,52 @@ public section.
         exception  TYPE REF TO cx_root,
         attempts   TYPE i,
       END OF ty_task .
-  types:
-    tt_tasks TYPE STANDARD TABLE OF ty_task WITH DEFAULT KEY .
+    TYPES:
+      tt_tasks TYPE STANDARD TABLE OF ty_task WITH DEFAULT KEY .
 
-  methods CONSTRUCTOR
-    importing
-      !IT_SERVER_GROUPS type STRING_TABLE optional
-      !IV_TIMEOUT type I default 60
-      !IV_MAX_WPS type I optional
-      !IV_MAX_ATTEMPTS type I default 10
-      !IV_MAX_PERCENT type I default 0
-      !IV_RESERVED_WPS type I default 0
-    raising
-      ZCX_BC_ASYNC_BASE .
-  methods ADD_TASK
-    importing
-      !IO_TASK type ref to ZCL_BC_ASYNC_TASK_BASE .
-  methods CLEAR_TASKS .
-  methods START
-    raising
-      ZCX_BC_ASYNC_BASE .
-  methods GET_TASKS
-    returning
-      value(RT_TASKS) type TT_TASKS .
-  methods GET_GROUP
-    returning
-      value(RV_GROUP) type RZLLITAB-CLASSNAME .
+    METHODS constructor
+      IMPORTING
+        !it_server_groups TYPE string_table OPTIONAL
+        !iv_timeout       TYPE i DEFAULT 60
+        !iv_max_wps       TYPE i OPTIONAL
+        !iv_max_attempts  TYPE i DEFAULT 10
+        !iv_max_percent   TYPE i DEFAULT 0
+        !iv_reserved_wps  TYPE i DEFAULT 0
+      RAISING
+        zcx_bc_async_base .
+    METHODS add_task
+      IMPORTING
+        !io_task TYPE REF TO zcl_bc_async_task_base .
+    METHODS clear_tasks .
+    METHODS start
+      RAISING
+        zcx_bc_async_base .
+    METHODS get_tasks
+      RETURNING
+        VALUE(rt_tasks) TYPE tt_tasks .
+    METHODS get_group
+      RETURNING
+        VALUE(rv_group) TYPE rzllitab-classname .
   PROTECTED SECTION.
     DATA mt_tasks TYPE tt_tasks .
-private section.
+  PRIVATE SECTION.
 
-  data MV_SERVER_GROUP type RZLLITAB-CLASSNAME .
-  data MV_RUNNING_TASKS type I .
-  data MV_FINISHED_TASKS type I .
-  data MV_TASK_TIMEOUT type I .
-  data MV_MAX_TASKS type DECFLOAT16 .
-  data MV_MAX_ATTEMPTS type I .
+    DATA mv_server_group TYPE rzllitab-classname .
+    DATA mv_running_tasks TYPE i .
+    DATA mv_finished_tasks TYPE i .
+    DATA mv_task_timeout TYPE i .
+    DATA mv_max_tasks TYPE decfloat16 .
+    DATA mv_max_attempts TYPE i .
 
-  methods CLOSE_TASK
-    importing
-      !IO_EXCEPTION type ref to CX_ROOT
-    changing
-      !CS_TASK type TY_TASK .
-  methods TASK_COMPLETE .
-  methods GET_NEXT_TASK
-    returning
-      value(RS_TASK) type ref to ZCL_BC_ASYNC_CONTROLLER=>TY_TASK .
+    METHODS close_task
+      IMPORTING
+        !io_exception TYPE REF TO cx_root
+      CHANGING
+        !cs_task      TYPE ty_task .
+    METHODS task_complete .
+    METHODS get_next_task
+      RETURNING
+        VALUE(rs_task) TYPE REF TO zcl_bc_async_controller=>ty_task .
 ENDCLASS.
 
 
@@ -104,14 +104,15 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           lt_server_groups TYPE STANDARD TABLE OF rzlli_apcl,
           lv_group_index   TYPE i.
 
-    FIELD-SYMBOLS <lv_server_group> LIKE LINE OF lt_server_groups.
+    mv_max_attempts = iv_max_attempts.
+    mv_task_timeout = iv_timeout.
 
     lt_server_groups = it_server_groups.
     IF lt_server_groups IS INITIAL.
       APPEND 'parallel_generators' TO lt_server_groups.
     ENDIF.
 
-    LOOP AT lt_server_groups ASSIGNING <lv_server_group>.
+    LOOP AT lt_server_groups ASSIGNING FIELD-SYMBOL(<lv_server_group>).
       lv_group_index = sy-tabix.
 
       CALL FUNCTION 'SPBT_INITIALIZE'
@@ -144,12 +145,12 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           IF sy-subrc <> 0.
             RAISE EXCEPTION TYPE zcx_bc_async_base
               EXPORTING
-                textid = zcx_bc_async_base=>initialize_error.
+                textid = zcx_bc_async_base=>initialization_error.
           ENDIF.
         WHEN 2 OR 6.
           RAISE EXCEPTION TYPE zcx_bc_async_base
             EXPORTING
-              textid = zcx_bc_async_base=>initialize_error.
+              textid = zcx_bc_async_base=>initialization_error.
         WHEN OTHERS.
           IF lv_group_index = lines( lt_server_groups ).
             RAISE EXCEPTION TYPE zcx_bc_async_base
@@ -161,6 +162,8 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
       ENDCASE.
 
     ENDLOOP.
+
+    mv_server_group = <lv_server_group>.
 
     DATA(lv_unused_wps) = COND i( WHEN iv_reserved_wps IS NOT INITIAL THEN iv_reserved_wps ELSE 5 ).
     DATA(lv_max_safe_wps) = nmax( val1 = ( lv_free_wps / 2 ) val2 = ( lv_free_wps - lv_unused_wps ) ).
@@ -179,23 +182,6 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           textid = zcx_bc_async_base=>resource_error.
     ENDIF.
 
-    mv_server_group = <lv_server_group>.
-
-    IF iv_max_attempts IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_bc_async_base
-        EXPORTING
-          textid = zcx_bc_async_base=>initial_attempts.
-    ENDIF.
-
-    mv_max_attempts = iv_max_attempts.
-
-    IF iv_timeout IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_bc_async_base
-        EXPORTING
-          textid = zcx_bc_async_base=>initial_timeout.
-    ENDIF.
-
-    mv_task_timeout = iv_timeout.
   ENDMETHOD.
 
 

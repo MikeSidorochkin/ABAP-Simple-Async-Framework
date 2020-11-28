@@ -47,18 +47,6 @@
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>ZBC_ASYNC</ARBGB>
-     <MSGNR>006</MSGNR>
-     <TEXT>Wrong timeout value</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>ZBC_ASYNC</ARBGB>
-     <MSGNR>007</MSGNR>
-     <TEXT>Wrong attempts count</TEXT>
-    </T100>
-    <T100>
-     <SPRSL>E</SPRSL>
-     <ARBGB>ZBC_ASYNC</ARBGB>
      <MSGNR>008</MSGNR>
      <TEXT>RFC System Error &amp;</TEXT>
     </T100>

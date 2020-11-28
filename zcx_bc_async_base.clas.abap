@@ -18,15 +18,6 @@ public section.
       attr4 type scx_attrname value '',
     end of GROUP_NOT_FOUND .
   constants:
-    begin of INITIALIZE_ERROR,
-      msgid type symsgid value 'ZBC_ASYNC',
-      msgno type symsgno value '002',
-      attr1 type scx_attrname value '',
-      attr2 type scx_attrname value '',
-      attr3 type scx_attrname value '',
-      attr4 type scx_attrname value '',
-    end of INITIALIZE_ERROR .
-  constants:
     begin of RESOURCE_ERROR,
       msgid type symsgid value 'ZBC_ASYNC',
       msgno type symsgno value '003',
@@ -54,24 +45,6 @@ public section.
       attr4 type scx_attrname value '',
     end of INITIAL_CONTROLLER .
   constants:
-    begin of INITIAL_TIMEOUT,
-      msgid type symsgid value 'ZBC_ASYNC',
-      msgno type symsgno value '006',
-      attr1 type scx_attrname value '',
-      attr2 type scx_attrname value '',
-      attr3 type scx_attrname value '',
-      attr4 type scx_attrname value '',
-    end of INITIAL_TIMEOUT .
-  constants:
-    begin of INITIAL_ATTEMPTS,
-      msgid type symsgid value 'ZBC_ASYNC',
-      msgno type symsgno value '007',
-      attr1 type scx_attrname value '',
-      attr2 type scx_attrname value '',
-      attr3 type scx_attrname value '',
-      attr4 type scx_attrname value '',
-    end of INITIAL_ATTEMPTS .
-  constants:
     begin of RFC_SYSTEM_FAILURE,
       msgid type symsgid value 'ZBC_ASYNC',
       msgno type symsgno value '008',
@@ -80,6 +53,15 @@ public section.
       attr3 type scx_attrname value '',
       attr4 type scx_attrname value '',
     end of RFC_SYSTEM_FAILURE .
+  constants:
+    begin of INITIALIZATION_ERROR,
+      msgid type symsgid value 'ZBC_ASYNC',
+      msgno type symsgno value '002',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of INITIALIZATION_ERROR .
   constants:
     begin of RFC_COMMUNICATION_FAILURE,
       msgid type symsgid value 'ZBC_ASYNC',
