@@ -1,8 +1,8 @@
 *******************************************************************
 *   System-defined Include-files.                                 *
 *******************************************************************
-  INCLUDE LZSB_PARALLEL_TESTTOP.             " Global Data
-  INCLUDE LZSB_PARALLEL_TESTUXX.             " Function Modules
+  INCLUDE LZBC_PARALLEL_TESTTOP.             " Global Data
+  INCLUDE LZBC_PARALLEL_TESTUXX.             " Function Modules
 
 *******************************************************************
 *   User-defined Include-files (if necessary).                    *

@@ -2,16 +2,16 @@
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_FUGR" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
-   <AREAT>Тест распаралелливания</AREAT>
+   <AREAT>pRFC Demo</AREAT>
    <INCLUDES>
-    <SOBJ_NAME>LZSB_PARALLEL_TESTTOP</SOBJ_NAME>
-    <SOBJ_NAME>SAPLZSB_PARALLEL_TEST</SOBJ_NAME>
+    <SOBJ_NAME>LZBC_PARALLEL_TESTTOP</SOBJ_NAME>
+    <SOBJ_NAME>SAPLZBC_PARALLEL_TEST</SOBJ_NAME>
    </INCLUDES>
    <FUNCTIONS>
     <item>
-     <FUNCNAME>ZSB_PARALELL_TEST</FUNCNAME>
+     <FUNCNAME>ZBC_PARALELL_TEST</FUNCNAME>
      <REMOTE_CALL>R</REMOTE_CALL>
-     <SHORT_TEXT>Асинхронный тест</SHORT_TEXT>
+     <SHORT_TEXT>pRFC Demo module</SHORT_TEXT>
     </item>
    </FUNCTIONS>
   </asx:values>
