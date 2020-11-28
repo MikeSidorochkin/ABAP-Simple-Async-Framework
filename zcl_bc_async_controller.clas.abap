@@ -123,7 +123,8 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
         WHEN 1.
           RAISE EXCEPTION TYPE zcx_bc_async_base
             EXPORTING
-              textid = zcx_bc_async_base=>group_not_found.
+              textid = zcx_bc_async_base=>group_not_found
+              mv_group = <lv_server_group>.
         WHEN 3.
           CALL FUNCTION 'SPBT_GET_CURR_RESOURCE_INFO'
             IMPORTING

@@ -18,35 +18,37 @@ CLASS zcl_bc_async_task_base DEFINITION
     METHODS get_name
       RETURNING
         VALUE(rv_name) TYPE guid_32 .
-  PROTECTED SECTION.
+protected section.
 
-    DATA mv_task_name TYPE guid_32 .
-    DATA mo_controller TYPE REF TO zcl_bc_async_controller .
-    DATA mr_task TYPE REF TO zcl_bc_async_controller=>ty_task .
-    DATA mv_server_group TYPE rzllitab-classname .
+  data MV_TASK_NAME type GUID_32 .
+  data MO_CONTROLLER type ref to ZCL_BC_ASYNC_CONTROLLER .
+  data MR_TASK type ref to ZCL_BC_ASYNC_CONTROLLER=>TY_TASK .
+  data MV_SERVER_GROUP type RZLLITAB-CLASSNAME .
 
-    METHODS start
-      RETURNING
-        VALUE(rv_subrc) TYPE sysubrc
-      RAISING
-        zcx_bc_async_base
-        zcx_bc_async_no_resources .
-    METHODS receive
-      RAISING
-        cx_dynamic_check .
-    METHODS start_internal
-      IMPORTING
-        !ir_task TYPE REF TO zcl_bc_async_controller=>ty_task
-      RAISING
-        zcx_bc_async_base
-        zcx_bc_async_no_resources .
-    METHODS exclude_server .
-    METHODS check_rfc_exception
-      IMPORTING
-        !iv_subrc TYPE sysubrc
-      RAISING
-        zcx_bc_async_base
-        zcx_bc_async_no_resources .
+  methods START
+    exporting
+      value(EV_SUBRC) type SYSUBRC
+      !EV_MESSAGE type TEXT255
+    raising
+      ZCX_BC_ASYNC_BASE
+      ZCX_BC_ASYNC_NO_RESOURCES .
+  methods RECEIVE
+    raising
+      CX_DYNAMIC_CHECK .
+  methods START_INTERNAL
+    importing
+      !IR_TASK type ref to ZCL_BC_ASYNC_CONTROLLER=>TY_TASK
+    raising
+      ZCX_BC_ASYNC_BASE
+      ZCX_BC_ASYNC_NO_RESOURCES .
+  methods EXCLUDE_SERVER .
+  methods CHECK_RFC_EXCEPTION
+    importing
+      !IV_SUBRC type SYSUBRC
+      !IV_MESSAGE type TEXT255
+    raising
+      ZCX_BC_ASYNC_BASE
+      ZCX_BC_ASYNC_NO_RESOURCES .
   PRIVATE SECTION.
 
 ENDCLASS.
@@ -64,7 +66,8 @@ CLASS ZCL_BC_ASYNC_TASK_BASE IMPLEMENTATION.
       WHEN 3.
         RAISE EXCEPTION TYPE zcx_bc_async_no_resources
           EXPORTING
-            textid = zcx_bc_async_no_resources=>rfc_start_error.
+            textid     = zcx_bc_async_no_resources=>rfc_start_error
+            mv_message = iv_message.
       WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
@@ -142,6 +145,10 @@ CLASS ZCL_BC_ASYNC_TASK_BASE IMPLEMENTATION.
 
   METHOD start_internal.
     mr_task = ir_task.
-    check_rfc_exception( start( ) ).
+    start( IMPORTING ev_subrc   = DATA(lv_subrc)
+                     ev_message = DATA(lv_message) ).
+
+    check_rfc_exception( iv_subrc   = lv_subrc
+                         iv_message = lv_message  ).
   ENDMETHOD.
 ENDCLASS.

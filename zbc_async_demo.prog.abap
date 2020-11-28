@@ -23,20 +23,17 @@ CLASS lcl_task IMPLEMENTATION.
       DESTINATION IN GROUP mv_server_group
       CALLING receive_internal ON END OF TASK
       EXCEPTIONS
-        communication_failure = 1
-        system_failure        = 2
+        communication_failure = 1 MESSAGE ev_message
+        system_failure        = 2 MESSAGE ev_message
         resource_failure      = 3
         OTHERS                = 4.
-    rv_subrc = sy-subrc.
+    ev_subrc = sy-subrc.
   ENDMETHOD.
 
   METHOD receive.
     RECEIVE RESULTS FROM FUNCTION 'ZBC_PARALELL_TEST'.
   ENDMETHOD.
 ENDCLASS.
-
-FIELD-SYMBOLS:
-  <ls_task> TYPE zcl_bc_async_controller=>ty_task.
 
 START-OF-SELECTION.
   DATA(go_timer) = cl_abap_runtime=>create_hr_timer( ).
@@ -62,11 +59,15 @@ START-OF-SELECTION.
   WRITE: / 'Processes started: ', p_calls.
   ULINE.
 
-  LOOP AT gt_tasks ASSIGNING <ls_task>.
+  LOOP AT gt_tasks ASSIGNING FIELD-SYMBOL(<ls_task>).
     WRITE: / 'Task name: ',   <ls_task>-name(5) ,
              'Start time: ',  |{ <ls_task>-start_time TIMESTAMP = ENVIRONMENT }|,
              'End time: ' ,   |{ <ls_task>-end_time TIMESTAMP = ENVIRONMENT }|.
   ENDLOOP.
 
   ULINE.
-  WRITE: /(50) 'Total time (sec)', |{ ( go_timer->get_runtime( ) - gv_start_time ) / 1000000 }|.
+
+  DATA(gv_time) = VALUE t( ).
+  gv_time = ( go_timer->get_runtime( ) - gv_start_time ) / 1000000.
+
+  WRITE: /(50) 'Total time:', |{ gv_time TIME = USER }|.

@@ -45,15 +45,6 @@ public section.
       attr4 type scx_attrname value '',
     end of INITIAL_CONTROLLER .
   constants:
-    begin of RFC_SYSTEM_FAILURE,
-      msgid type symsgid value 'ZBC_ASYNC',
-      msgno type symsgno value '008',
-      attr1 type scx_attrname value 'IV_MSGV1',
-      attr2 type scx_attrname value '',
-      attr3 type scx_attrname value '',
-      attr4 type scx_attrname value '',
-    end of RFC_SYSTEM_FAILURE .
-  constants:
     begin of INITIALIZATION_ERROR,
       msgid type symsgid value 'ZBC_ASYNC',
       msgno type symsgno value '002',
@@ -62,34 +53,15 @@ public section.
       attr3 type scx_attrname value '',
       attr4 type scx_attrname value '',
     end of INITIALIZATION_ERROR .
-  constants:
-    begin of RFC_COMMUNICATION_FAILURE,
-      msgid type symsgid value 'ZBC_ASYNC',
-      msgno type symsgno value '009',
-      attr1 type scx_attrname value 'IV_MSGV1',
-      attr2 type scx_attrname value '',
-      attr3 type scx_attrname value '',
-      attr4 type scx_attrname value '',
-    end of RFC_COMMUNICATION_FAILURE .
   data MV_GROUP type RZLLITAB-CLASSNAME .
-  data IV_MSGV1 type MSGV1 .
-  data IV_MSGV2 type MSGV2 .
-  data IV_MSGV3 type MSGV3 .
-  data IV_MSGV4 type MSGV4 .
 
   methods CONSTRUCTOR
     importing
       !TEXTID like IF_T100_MESSAGE=>T100KEY optional
       !PREVIOUS like PREVIOUS optional
-      !MV_GROUP type RZLLITAB-CLASSNAME optional
-      !IV_MSGV1 type MSGV1 optional
-      !IV_MSGV2 type MSGV2 optional
-      !IV_MSGV3 type MSGV3 optional
-      !IV_MSGV4 type MSGV4 optional .
-  PROTECTED SECTION.
-
-  PRIVATE SECTION.
-
+      !MV_GROUP type RZLLITAB-CLASSNAME optional .
+protected section.
+private section.
 ENDCLASS.
 
 
@@ -97,20 +69,17 @@ ENDCLASS.
 CLASS ZCX_BC_ASYNC_BASE IMPLEMENTATION.
 
 
-  METHOD constructor ##ADT_SUPPRESS_GENERATION.
-    CALL METHOD super->constructor
-      EXPORTING
-        previous = previous.
-    me->mv_group = mv_group .
-    me->iv_msgv1 = iv_msgv1 .
-    me->iv_msgv2 = iv_msgv2 .
-    me->iv_msgv3 = iv_msgv3 .
-    me->iv_msgv4 = iv_msgv4 .
-    CLEAR me->textid.
-    IF textid IS INITIAL.
-      if_t100_message~t100key = if_t100_message=>default_textid.
-    ELSE.
-      if_t100_message~t100key = textid.
-    ENDIF.
-  ENDMETHOD.
+  method CONSTRUCTOR.
+CALL METHOD SUPER->CONSTRUCTOR
+EXPORTING
+PREVIOUS = PREVIOUS
+.
+me->MV_GROUP = MV_GROUP .
+clear me->textid.
+if textid is initial.
+  IF_T100_MESSAGE~T100KEY = IF_T100_MESSAGE=>DEFAULT_TEXTID.
+else.
+  IF_T100_MESSAGE~T100KEY = TEXTID.
+endif.
+  endmethod.
 ENDCLASS.
