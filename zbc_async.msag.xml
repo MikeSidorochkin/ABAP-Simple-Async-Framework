@@ -50,6 +50,18 @@
      <MSGNR>006</MSGNR>
      <TEXT>RFC Start Problem:</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>Resource timeout</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>Number of attempts exceeded</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

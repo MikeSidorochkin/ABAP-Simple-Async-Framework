@@ -30,7 +30,6 @@ protected section.
       value(EV_SUBRC) type SYSUBRC
       !EV_MESSAGE type TEXT255
     raising
-      ZCX_BC_ASYNC_BASE
       ZCX_BC_ASYNC_NO_RESOURCES .
   methods RECEIVE
     raising
@@ -39,7 +38,6 @@ protected section.
     importing
       !IR_TASK type ref to ZCL_BC_ASYNC_CONTROLLER=>TY_TASK
     raising
-      ZCX_BC_ASYNC_BASE
       ZCX_BC_ASYNC_NO_RESOURCES .
   methods EXCLUDE_SERVER .
   methods CHECK_RFC_EXCEPTION
@@ -47,7 +45,6 @@ protected section.
       !IV_SUBRC type SYSUBRC
       !IV_MESSAGE type TEXT255
     raising
-      ZCX_BC_ASYNC_BASE
       ZCX_BC_ASYNC_NO_RESOURCES .
   PRIVATE SECTION.
 

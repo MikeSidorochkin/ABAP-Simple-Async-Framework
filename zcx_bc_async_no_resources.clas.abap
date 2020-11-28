@@ -19,6 +19,24 @@ public section.
       attr3 type scx_attrname value '',
       attr4 type scx_attrname value '',
     end of RFC_START_ERROR .
+  constants:
+    begin of TIMEOUT,
+      msgid type symsgid value 'ZBC_ASYNC',
+      msgno type symsgno value '007',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of TIMEOUT .
+  constants:
+    begin of ATTEMPTS_EXCEEDED,
+      msgid type symsgid value 'ZBC_ASYNC',
+      msgno type symsgno value '008',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of ATTEMPTS_EXCEEDED .
   data MV_MESSAGE type TEXT255 .
 
   methods CONSTRUCTOR
