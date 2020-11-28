@@ -63,9 +63,9 @@ START-OF-SELECTION.
   ULINE.
 
   LOOP AT gt_tasks ASSIGNING <ls_task>.
-    WRITE: / 'Task name: ',   <ls_task>-name(5),
-             'Start time: ',  <ls_task>-start_time,
-             'End time: ' ,   <ls_task>-end_time.
+    WRITE: / 'Task name: ',   <ls_task>-name(5) ,
+             'Start time: ',  |{ <ls_task>-start_time TIMESTAMP = ENVIRONMENT }|,
+             'End time: ' ,   |{ <ls_task>-end_time TIMESTAMP = ENVIRONMENT }|.
   ENDLOOP.
 
   ULINE.

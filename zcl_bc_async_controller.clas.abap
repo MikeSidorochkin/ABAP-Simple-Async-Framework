@@ -16,10 +16,8 @@ CLASS zcl_bc_async_controller DEFINITION
       BEGIN OF ty_task,
         task       TYPE REF TO zcl_bc_async_task_base,
         name       TYPE guid_32,
-        start_time TYPE t,
-        start_date TYPE d,
-        end_time   TYPE t,
-        end_date   TYPE d,
+        start_time TYPE timestampl,
+        end_time   TYPE timestampl,
         exception  TYPE REF TO cx_root,
         attempts   TYPE i,
       END OF ty_task .
@@ -60,7 +58,7 @@ CLASS zcl_bc_async_controller DEFINITION
     DATA mv_max_tasks TYPE decfloat16 .
     DATA mv_max_attempts TYPE i .
 
-    METHODS close_task
+    METHODS skip_task
       IMPORTING
         !io_exception TYPE REF TO cx_root
       CHANGING
@@ -86,16 +84,6 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
   METHOD clear_tasks.
     CLEAR mt_tasks.
-  ENDMETHOD.
-
-
-  METHOD close_task.
-    cs_task-start_date  = sy-datum.
-    cs_task-start_time  = sy-uzeit.
-    cs_task-end_date    = sy-datum.
-    cs_task-end_time    = sy-uzeit.
-    mv_finished_tasks   = mv_finished_tasks + 1.
-    cs_task-exception   = io_exception.
   ENDMETHOD.
 
 
@@ -191,7 +179,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
 
   METHOD get_next_task.
-    LOOP AT mt_tasks ASSIGNING FIELD-SYMBOL(<ls_task>) WHERE start_date IS INITIAL.
+    LOOP AT mt_tasks ASSIGNING FIELD-SYMBOL(<ls_task>) WHERE start_time IS INITIAL.
       EXIT.
     ENDLOOP.
 
@@ -203,6 +191,14 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
   METHOD get_tasks.
     rt_tasks = mt_tasks.
+  ENDMETHOD.
+
+
+  METHOD skip_task.
+    GET TIME STAMP FIELD cs_task-start_time.
+    GET TIME STAMP FIELD cs_task-end_time.
+    mv_finished_tasks = mv_finished_tasks + 1.
+    cs_task-exception = io_exception.
   ENDMETHOD.
 
 
@@ -230,8 +226,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
       TRY.
           <ls_task>-task->start_internal( lr_task ).
-          <ls_task>-start_date = sy-datum.
-          <ls_task>-start_time = sy-uzeit.
+          GET TIME STAMP FIELD <ls_task>-start_time.
           mv_running_tasks = mv_running_tasks + 1.
           lv_started_tasks = lv_started_tasks + 1.
         CATCH zcx_bc_async_no_resources INTO DATA(lo_exception).
@@ -242,7 +237,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           IF sy-subrc = 0.
             <ls_task>-attempts = <ls_task>-attempts + 1.
             IF <ls_task>-attempts >= mv_max_attempts.
-              close_task(
+              skip_task(
                 EXPORTING
                   io_exception = lo_exception
                 CHANGING
@@ -250,7 +245,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
               lv_started_tasks = lv_started_tasks + 1.
             ENDIF.
           ELSE.
-            close_task(
+            skip_task(
               EXPORTING
                 io_exception = lo_exception
               CHANGING
@@ -259,6 +254,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           ENDIF.
 
         CATCH cx_root INTO <ls_task>-exception.
+          GET TIME STAMP FIELD <ls_task>-end_time.
       ENDTRY.
 
     ENDWHILE.

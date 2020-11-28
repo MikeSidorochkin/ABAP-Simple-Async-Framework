@@ -53,7 +53,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_bc_async_task_base IMPLEMENTATION.
+CLASS ZCL_BC_ASYNC_TASK_BASE IMPLEMENTATION.
 
 
   METHOD check_rfc_exception.
@@ -122,8 +122,7 @@ CLASS zcl_bc_async_task_base IMPLEMENTATION.
 
     ASSIGN mr_task->* TO <ls_task>.
     IF sy-subrc = 0.
-      <ls_task>-end_date = sy-datum.
-      <ls_task>-end_time = sy-uzeit.
+      GET TIME STAMP FIELD <ls_task>-end_time.
     ENDIF.
 
     TRY.
