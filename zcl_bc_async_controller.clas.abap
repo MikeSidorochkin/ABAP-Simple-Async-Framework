@@ -3,68 +3,72 @@
 *----------------------------------------------------------------------*
 *
 *----------------------------------------------------------------------*
-CLASS zcl_bc_async_controller DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC
+class ZCL_BC_ASYNC_CONTROLLER definition
+  public
+  final
+  create public
 
-  GLOBAL FRIENDS zcl_bc_async_task_base .
+  global friends ZCL_BC_ASYNC_TASK_BASE .
 
-  PUBLIC SECTION.
+public section.
 
-    TYPES:
-      BEGIN OF ty_task,
+  types:
+    BEGIN OF ty_task,
         task       TYPE REF TO zcl_bc_async_task_base,
         name       TYPE guid_32,
-        pid        TYPE wpinfo-wp_pid,
         start_time TYPE t,
         start_date TYPE d,
         end_time   TYPE t,
         end_date   TYPE d,
         exception  TYPE REF TO cx_root,
-        text       TYPE string,
-        count      TYPE i,
+        attempts   TYPE i,
       END OF ty_task .
-    TYPES:
-      tt_tasks TYPE STANDARD TABLE OF ty_task WITH DEFAULT KEY .
+  types:
+    tt_tasks TYPE STANDARD TABLE OF ty_task WITH DEFAULT KEY .
 
-    METHODS constructor
-      IMPORTING
-        !it_server_groups TYPE zsbt_d7737_server_group OPTIONAL
-        !iv_timeout       TYPE i DEFAULT 60
-        !iv_max_wps       TYPE i OPTIONAL
-        !iv_max_attempts  TYPE i DEFAULT 10
-        !iv_max_percent   TYPE i DEFAULT 0
-        !iv_reserved_wps  TYPE i DEFAULT 0
-      RAISING
-        zcx_bc_async_base .
-    METHODS add_task
-      IMPORTING
-        !io_task TYPE REF TO zcl_bc_async_task_base .
-    METHODS clear_tasks .
-    METHODS start
-      RAISING
-        zcx_bc_async_base .
-    METHODS get_tasks
-      RETURNING
-        VALUE(rt_tasks) TYPE tt_tasks .
-    METHODS get_group
-      RETURNING
-        VALUE(rv_group) TYPE rzllitab-classname .
+  methods CONSTRUCTOR
+    importing
+      !IT_SERVER_GROUPS type STRING_TABLE optional
+      !IV_TIMEOUT type I default 60
+      !IV_MAX_WPS type I optional
+      !IV_MAX_ATTEMPTS type I default 10
+      !IV_MAX_PERCENT type I default 0
+      !IV_RESERVED_WPS type I default 0
+    raising
+      ZCX_BC_ASYNC_BASE .
+  methods ADD_TASK
+    importing
+      !IO_TASK type ref to ZCL_BC_ASYNC_TASK_BASE .
+  methods CLEAR_TASKS .
+  methods START
+    raising
+      ZCX_BC_ASYNC_BASE .
+  methods GET_TASKS
+    returning
+      value(RT_TASKS) type TT_TASKS .
+  methods GET_GROUP
+    returning
+      value(RV_GROUP) type RZLLITAB-CLASSNAME .
   PROTECTED SECTION.
     DATA mt_tasks TYPE tt_tasks .
-  PRIVATE SECTION.
-    DATA mv_server_group TYPE rzllitab-classname .
-    DATA mv_running_tasks TYPE i .
-    DATA mv_finished_tasks TYPE i .
-    DATA mv_task_timeout TYPE i .
-    DATA mv_max_tasks TYPE decfloat16 .
-    DATA mv_max_attempts TYPE i .
+private section.
 
-    METHODS task_complete .
-    METHODS get_next_task
-      RETURNING
-        VALUE(rs_task) TYPE REF TO zcl_bc_async_controller=>ty_task .
+  data MV_SERVER_GROUP type RZLLITAB-CLASSNAME .
+  data MV_RUNNING_TASKS type I .
+  data MV_FINISHED_TASKS type I .
+  data MV_TASK_TIMEOUT type I .
+  data MV_MAX_TASKS type DECFLOAT16 .
+  data MV_MAX_ATTEMPTS type I .
+
+  methods CLOSE_TASK
+    importing
+      !IO_EXCEPTION type ref to CX_ROOT
+    changing
+      !CS_TASK type TY_TASK .
+  methods TASK_COMPLETE .
+  methods GET_NEXT_TASK
+    returning
+      value(RS_TASK) type ref to ZCL_BC_ASYNC_CONTROLLER=>TY_TASK .
 ENDCLASS.
 
 
@@ -73,25 +77,31 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
 
   METHOD add_task.
-    FIELD-SYMBOLS:
-      <ls_task> TYPE ty_task.
-
     CHECK io_task IS BOUND.
 
-    APPEND INITIAL LINE TO mt_tasks ASSIGNING <ls_task>.
-    <ls_task>-task = io_task.
-    <ls_task>-name = io_task->get_name( ).
-  ENDMETHOD.                    "add_task
+    APPEND VALUE #( task = io_task
+                    name = io_task->get_name( ) ) TO mt_tasks.
+  ENDMETHOD.
 
 
   METHOD clear_tasks.
     CLEAR mt_tasks.
-  ENDMETHOD.                    "CLEAR_TASKS
+  ENDMETHOD.
+
+
+  METHOD close_task.
+    cs_task-start_date  = sy-datum.
+    cs_task-start_time  = sy-uzeit.
+    cs_task-end_date    = sy-datum.
+    cs_task-end_time    = sy-uzeit.
+    mv_finished_tasks   = mv_finished_tasks + 1.
+    cs_task-exception   = io_exception.
+  ENDMETHOD.
 
 
   METHOD constructor.
     DATA: lv_free_wps      TYPE i,
-          lt_server_groups LIKE it_server_groups,
+          lt_server_groups TYPE STANDARD TABLE OF rzlli_apcl,
           lv_group_index   TYPE i.
 
     FIELD-SYMBOLS <lv_server_group> LIKE LINE OF lt_server_groups.
@@ -186,38 +196,34 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
     ENDIF.
 
     mv_task_timeout = iv_timeout.
-  ENDMETHOD.                    "CONSTRUCTOR
+  ENDMETHOD.
 
 
   METHOD get_group.
     rv_group = mv_server_group.
-  ENDMETHOD.                    "GET_GROUP
+  ENDMETHOD.
 
 
   METHOD get_next_task.
-    FIELD-SYMBOLS: <ls_task> TYPE zcl_bc_async_controller=>ty_task.
-
-    LOOP AT mt_tasks ASSIGNING <ls_task> WHERE start_date IS INITIAL.
+    LOOP AT mt_tasks ASSIGNING FIELD-SYMBOL(<ls_task>) WHERE start_date IS INITIAL.
       EXIT.
     ENDLOOP.
 
     CHECK sy-subrc = 0.
 
     GET REFERENCE OF <ls_task> INTO rs_task.
-  ENDMETHOD.                    "get_next_task
+  ENDMETHOD.
 
 
   METHOD get_tasks.
     rt_tasks = mt_tasks.
-  ENDMETHOD.                    "GET_TASKS
+  ENDMETHOD.
 
 
   METHOD start.
     DATA:
       lv_started_tasks TYPE i,
-      lv_max_wps       TYPE i,
-      lo_resource      TYPE REF TO zcx_bc_async_no_resources,
-      lr_task          TYPE REF TO ty_task.
+      lv_max_wps       TYPE i.
 
     FIELD-SYMBOLS:
       <ls_task> TYPE ty_task.
@@ -225,25 +231,12 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
     mv_running_tasks = 0.
     mv_finished_tasks = 0.
 
-    DEFINE close_task.
-      <ls_task>-start_date = sy-datum.
-      <ls_task>-start_time = sy-uzeit.
-      <ls_task>-end_date = sy-datum.
-      <ls_task>-end_time = sy-uzeit.
-      lv_started_tasks = lv_started_tasks + 1.
-      mv_finished_tasks = mv_finished_tasks + 1.
-    END-OF-DEFINITION.
-
-    "*  check_quota( ).
-
     WHILE lv_started_tasks <> lines( mt_tasks ).
-      CLEAR lr_task.
-
       IF mv_running_tasks >= mv_max_tasks AND mv_max_tasks IS NOT INITIAL.
         WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_running_tasks < mv_max_tasks.
       ENDIF.
 
-      lr_task = get_next_task( ).
+      DATA(lr_task) = get_next_task( ).
       IF lr_task IS INITIAL.
         EXIT.
       ENDIF.
@@ -255,38 +248,41 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           <ls_task>-start_time = sy-uzeit.
           mv_running_tasks = mv_running_tasks + 1.
           lv_started_tasks = lv_started_tasks + 1.
-        CATCH zcx_bc_async_no_resources INTO lo_resource.
+        CATCH zcx_bc_async_no_resources INTO DATA(lo_exception).
 
           WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_finished_tasks >= lv_started_tasks
                UP TO mv_task_timeout SECONDS.
 
           IF sy-subrc = 0.
-
-            <ls_task>-count = <ls_task>-count + 1.
-            IF <ls_task>-count >= mv_max_attempts.
-              close_task.
-              <ls_task>-exception = lo_resource.
-              <ls_task>-text = <ls_task>-exception->get_text( ).
+            <ls_task>-attempts = <ls_task>-attempts + 1.
+            IF <ls_task>-attempts >= mv_max_attempts.
+              close_task(
+                EXPORTING
+                  io_exception = lo_exception
+                CHANGING
+                  cs_task      = <ls_task> ).
+              lv_started_tasks = lv_started_tasks + 1.
             ENDIF.
           ELSE.
-            close_task.
-            <ls_task>-exception = lo_resource.
-            <ls_task>-text = <ls_task>-exception->get_text( ).
+            close_task(
+              EXPORTING
+                io_exception = lo_exception
+              CHANGING
+                cs_task      = <ls_task> ).
+            lv_started_tasks = lv_started_tasks + 1.
           ENDIF.
 
         CATCH cx_root INTO <ls_task>-exception.
-          <ls_task>-text = <ls_task>-exception->get_text( ).
-
       ENDTRY.
 
     ENDWHILE.
 
     WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_finished_tasks >= lv_started_tasks.
-  ENDMETHOD.                    "start
+  ENDMETHOD.
 
 
   METHOD task_complete.
     mv_finished_tasks = mv_finished_tasks + 1.
     mv_running_tasks = mv_running_tasks - 1.
-  ENDMETHOD.                    "TASK_COMPLETE
+  ENDMETHOD.
 ENDCLASS.

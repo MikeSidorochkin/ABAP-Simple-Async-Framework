@@ -18,7 +18,6 @@ PARAMETERS:
 
 CLASS lcl_task IMPLEMENTATION.
   METHOD start.
-    " Starting a new task
     CALL FUNCTION 'ZSB_PARALELL_TEST'
       STARTING NEW TASK mv_task_name
       DESTINATION IN GROUP mv_server_group
@@ -28,29 +27,11 @@ CLASS lcl_task IMPLEMENTATION.
         system_failure        = 2
         resource_failure      = 3
         OTHERS                = 4.
-
-    CASE sy-subrc.
-      WHEN 1 OR 2.
-        exclude_server( ).
-      WHEN 0.
-      WHEN 3.
-        RAISE EXCEPTION TYPE zcx_bc_async_no_resources
-          EXPORTING
-            textid = zcx_bc_async_no_resources=>rfc_start_error.
-      WHEN OTHERS.
-    ENDCASE.
-
+    rv_subrc = sy-subrc.
   ENDMETHOD.
 
   METHOD receive.
-    FIELD-SYMBOLS:
-      <ls_task> TYPE zcl_bc_async_controller=>ty_task.
-
-    ASSIGN mr_task->* TO <ls_task>.
-
-    RECEIVE RESULTS FROM FUNCTION 'ZSB_PARALELL_TEST'
-      IMPORTING
-        pid    = <ls_task>-pid.
+    RECEIVE RESULTS FROM FUNCTION 'ZSB_PARALELL_TEST'.
   ENDMETHOD.
 ENDCLASS.
 
@@ -62,7 +43,7 @@ START-OF-SELECTION.
   DATA(gv_start_time) = go_timer->get_runtime( ).
 
   TRY.
-      DATA(go_controller) = NEW zcl_bc_async_controller( it_server_groups = VALUE zsbt_d7737_server_group( ( p_s_grp ) )
+      DATA(go_controller) = NEW zcl_bc_async_controller( it_server_groups = VALUE #( ( CONV #( p_s_grp ) ) )
                                                          iv_max_percent   = p_perc ).
 
       DO p_calls TIMES.
@@ -83,7 +64,6 @@ START-OF-SELECTION.
 
   LOOP AT gt_tasks ASSIGNING <ls_task>.
     WRITE: / 'Task name: ',   <ls_task>-name(5),
-             'PID: ',         <ls_task>-pid,
              'Start time: ',  <ls_task>-start_time,
              'End time: ' ,   <ls_task>-end_time.
   ENDLOOP.

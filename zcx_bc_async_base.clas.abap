@@ -5,14 +5,12 @@ class ZCX_BC_ASYNC_BASE definition
   create public .
 
 public section.
-*"* public components of class ZCX_SB_D7737_ASYNC_BASE
-*"* do not include other source files here!!!
 
   interfaces IF_T100_MESSAGE .
 
   constants:
     begin of GROUP_NOT_FOUND,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
+      msgid type symsgid value 'ZBC_ASYNC',
       msgno type symsgno value '001',
       attr1 type scx_attrname value 'MV_GROUP',
       attr2 type scx_attrname value '',
@@ -21,7 +19,7 @@ public section.
     end of GROUP_NOT_FOUND .
   constants:
     begin of INITIALIZE_ERROR,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
+      msgid type symsgid value 'ZBC_ASYNC',
       msgno type symsgno value '002',
       attr1 type scx_attrname value '',
       attr2 type scx_attrname value '',
@@ -30,7 +28,7 @@ public section.
     end of INITIALIZE_ERROR .
   constants:
     begin of RESOURCE_ERROR,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
+      msgid type symsgid value 'ZBC_ASYNC',
       msgno type symsgno value '003',
       attr1 type scx_attrname value '',
       attr2 type scx_attrname value '',
@@ -39,8 +37,8 @@ public section.
     end of RESOURCE_ERROR .
   constants:
     begin of INITIAL_NAME,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
-      msgno type symsgno value '005',
+      msgid type symsgid value 'ZBC_ASYNC',
+      msgno type symsgno value '004',
       attr1 type scx_attrname value '',
       attr2 type scx_attrname value '',
       attr3 type scx_attrname value '',
@@ -48,8 +46,8 @@ public section.
     end of INITIAL_NAME .
   constants:
     begin of INITIAL_CONTROLLER,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
-      msgno type symsgno value '004',
+      msgid type symsgid value 'ZBC_ASYNC',
+      msgno type symsgno value '005',
       attr1 type scx_attrname value '',
       attr2 type scx_attrname value '',
       attr3 type scx_attrname value '',
@@ -57,7 +55,7 @@ public section.
     end of INITIAL_CONTROLLER .
   constants:
     begin of INITIAL_TIMEOUT,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
+      msgid type symsgid value 'ZBC_ASYNC',
       msgno type symsgno value '006',
       attr1 type scx_attrname value '',
       attr2 type scx_attrname value '',
@@ -66,7 +64,7 @@ public section.
     end of INITIAL_TIMEOUT .
   constants:
     begin of INITIAL_ATTEMPTS,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
+      msgid type symsgid value 'ZBC_ASYNC',
       msgno type symsgno value '007',
       attr1 type scx_attrname value '',
       attr2 type scx_attrname value '',
@@ -74,18 +72,9 @@ public section.
       attr4 type scx_attrname value '',
     end of INITIAL_ATTEMPTS .
   constants:
-    begin of QUOTA_ERROR,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
-      msgno type symsgno value '008',
-      attr1 type scx_attrname value '',
-      attr2 type scx_attrname value '',
-      attr3 type scx_attrname value '',
-      attr4 type scx_attrname value '',
-    end of QUOTA_ERROR .
-  constants:
     begin of RFC_SYSTEM_FAILURE,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
-      msgno type symsgno value '009',
+      msgid type symsgid value 'ZBC_ASYNC',
+      msgno type symsgno value '008',
       attr1 type scx_attrname value 'IV_MSGV1',
       attr2 type scx_attrname value '',
       attr3 type scx_attrname value '',
@@ -93,8 +82,8 @@ public section.
     end of RFC_SYSTEM_FAILURE .
   constants:
     begin of RFC_COMMUNICATION_FAILURE,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
-      msgno type symsgno value '010',
+      msgid type symsgid value 'ZBC_ASYNC',
+      msgno type symsgno value '009',
       attr1 type scx_attrname value 'IV_MSGV1',
       attr2 type scx_attrname value '',
       attr3 type scx_attrname value '',
@@ -115,12 +104,10 @@ public section.
       !IV_MSGV2 type MSGV2 optional
       !IV_MSGV3 type MSGV3 optional
       !IV_MSGV4 type MSGV4 optional .
-protected section.
-*"* protected components of class ZCX_SB_D7737_ASYNC_BASE
-*"* do not include other source files here!!!
-private section.
-*"* private components of class ZCX_SB_D7737_ASYNC_BASE
-*"* do not include other source files here!!!
+  PROTECTED SECTION.
+
+  PRIVATE SECTION.
+
 ENDCLASS.
 
 
@@ -128,21 +115,20 @@ ENDCLASS.
 CLASS ZCX_BC_ASYNC_BASE IMPLEMENTATION.
 
 
-method CONSTRUCTOR ##ADT_SUPPRESS_GENERATION.
-CALL METHOD SUPER->CONSTRUCTOR
-EXPORTING
-PREVIOUS = PREVIOUS
-.
-me->MV_GROUP = MV_GROUP .
-me->IV_MSGV1 = IV_MSGV1 .
-me->IV_MSGV2 = IV_MSGV2 .
-me->IV_MSGV3 = IV_MSGV3 .
-me->IV_MSGV4 = IV_MSGV4 .
-clear me->textid.
-if textid is initial.
-  IF_T100_MESSAGE~T100KEY = IF_T100_MESSAGE=>DEFAULT_TEXTID.
-else.
-  IF_T100_MESSAGE~T100KEY = TEXTID.
-endif.
-endmethod.
+  METHOD constructor ##ADT_SUPPRESS_GENERATION.
+    CALL METHOD super->constructor
+      EXPORTING
+        previous = previous.
+    me->mv_group = mv_group .
+    me->iv_msgv1 = iv_msgv1 .
+    me->iv_msgv2 = iv_msgv2 .
+    me->iv_msgv3 = iv_msgv3 .
+    me->iv_msgv4 = iv_msgv4 .
+    CLEAR me->textid.
+    IF textid IS INITIAL.
+      if_t100_message~t100key = if_t100_message=>default_textid.
+    ELSE.
+      if_t100_message~t100key = textid.
+    ENDIF.
+  ENDMETHOD.
 ENDCLASS.

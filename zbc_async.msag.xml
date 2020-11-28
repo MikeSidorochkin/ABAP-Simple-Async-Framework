@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>ZBC_ASYNC</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>pRFC Messages</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>000</MSGNR>
+     <TEXT>pRFС module not started</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>001</MSGNR>
+     <TEXT>pRFC group not found</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>002</MSGNR>
+     <TEXT>pRFC Initialization Error</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>003</MSGNR>
+     <TEXT>No resources</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>004</MSGNR>
+     <TEXT>Wrong name value</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>005</MSGNR>
+     <TEXT>Wrong controller object</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>006</MSGNR>
+     <TEXT>Wrong timeout value</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>Wrong attempts count</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>RFC System Error &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>RFC Communication Error &amp;</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>

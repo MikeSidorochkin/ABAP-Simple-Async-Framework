@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCX_BC_ASYNC_NO_RESOURCES</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Ошибка выделения ресурсов</DESCRIPT>
+    <DESCRIPT>pRFC Resourse exception</DESCRIPT>
     <CATEGORY>40</CATEGORY>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>

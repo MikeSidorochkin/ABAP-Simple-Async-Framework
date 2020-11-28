@@ -5,15 +5,15 @@ class ZCX_BC_ASYNC_NO_RESOURCES definition
   create public .
 
 public section.
+
 *"* public components of class ZCX_SB_D7737_RESOURCE
 *"* do not include other source files here!!!
-
   interfaces IF_T100_MESSAGE .
 
   constants:
     begin of RFC_START_ERROR,
-      msgid type symsgid value 'ZHR_S0654_PARAL',
-      msgno type symsgno value '011',
+      msgid type symsgid value 'ZBC_ASYNC',
+      msgno type symsgno value '000',
       attr1 type scx_attrname value '',
       attr2 type scx_attrname value '',
       attr3 type scx_attrname value '',

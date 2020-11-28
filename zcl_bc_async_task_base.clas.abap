@@ -1,16 +1,14 @@
-CLASS ZCL_BC_ASYNC_TASK_BASE DEFINITION
+CLASS zcl_bc_async_task_base DEFINITION
   PUBLIC
   CREATE PUBLIC
 
   GLOBAL FRIENDS zcl_bc_async_controller .
 
   PUBLIC SECTION.
-*"* public components of class ZCL_SB_D7737_ASYNC_TASK_BASE
-*"* do not include other source files here!!!
 
     METHODS constructor
       IMPORTING
-        !iv_name TYPE guid_32
+        !iv_name       TYPE guid_32
         !io_controller TYPE REF TO zcl_bc_async_controller
       RAISING
         zcx_bc_async_base .
@@ -19,38 +17,57 @@ CLASS ZCL_BC_ASYNC_TASK_BASE DEFINITION
         !p_task TYPE guid_32 .
     METHODS get_name
       RETURNING
-        value(rv_name) TYPE guid_32 .
-protected section.
+        VALUE(rv_name) TYPE guid_32 .
+  PROTECTED SECTION.
 
-*"* protected components of class ZCL_SB_D7737_ASYNC_TASK_BASE
-*"* do not include other source files here!!!
-  data MV_TASK_NAME type GUID_32 .
-  data MO_CONTROLLER type ref to ZCL_BC_ASYNC_CONTROLLER .
-  data MR_TASK type ref to ZCL_BC_ASYNC_CONTROLLER=>TY_TASK .
-  data MV_SERVER_GROUP type RZLLITAB-CLASSNAME .
+    DATA mv_task_name TYPE guid_32 .
+    DATA mo_controller TYPE REF TO zcl_bc_async_controller .
+    DATA mr_task TYPE REF TO zcl_bc_async_controller=>ty_task .
+    DATA mv_server_group TYPE rzllitab-classname .
 
-  methods START
-    raising
-      ZCX_BC_ASYNC_BASE
-      ZCX_BC_ASYNC_NO_RESOURCES .
-  methods RECEIVE
-    raising
-      CX_DYNAMIC_CHECK .
-  methods START_INTERNAL
-    importing
-      !IR_TASK type ref to ZCL_BC_ASYNC_CONTROLLER=>TY_TASK
-    raising
-      ZCX_BC_ASYNC_BASE
-      ZCX_BC_ASYNC_NO_RESOURCES .
-  methods EXCLUDE_SERVER .
+    METHODS start
+      RETURNING
+        VALUE(rv_subrc) TYPE sysubrc
+      RAISING
+        zcx_bc_async_base
+        zcx_bc_async_no_resources .
+    METHODS receive
+      RAISING
+        cx_dynamic_check .
+    METHODS start_internal
+      IMPORTING
+        !ir_task TYPE REF TO zcl_bc_async_controller=>ty_task
+      RAISING
+        zcx_bc_async_base
+        zcx_bc_async_no_resources .
+    METHODS exclude_server .
+    METHODS check_rfc_exception
+      IMPORTING
+        !iv_subrc TYPE sysubrc
+      RAISING
+        zcx_bc_async_base
+        zcx_bc_async_no_resources .
   PRIVATE SECTION.
-*"* private components of class ZCL_SB_D7737_ASYNC_TASK_BASE
-*"* do not include other source files here!!!
+
 ENDCLASS.
 
 
 
-CLASS ZCL_BC_ASYNC_TASK_BASE IMPLEMENTATION.
+CLASS zcl_bc_async_task_base IMPLEMENTATION.
+
+
+  METHOD check_rfc_exception.
+    CASE iv_subrc.
+      WHEN 1 OR 2.
+        exclude_server( ).
+      WHEN 0.
+      WHEN 3.
+        RAISE EXCEPTION TYPE zcx_bc_async_no_resources
+          EXPORTING
+            textid = zcx_bc_async_no_resources=>rfc_start_error.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDMETHOD.
 
 
   METHOD constructor.
@@ -69,7 +86,7 @@ CLASS ZCL_BC_ASYNC_TASK_BASE IMPLEMENTATION.
     mv_task_name = iv_name.
     mv_server_group = io_controller->get_group( ).
     mo_controller = io_controller.
-  ENDMETHOD.                    "constructor
+  ENDMETHOD.
 
 
   METHOD exclude_server.
@@ -90,17 +107,14 @@ CLASS ZCL_BC_ASYNC_TASK_BASE IMPLEMENTATION.
 
   METHOD get_name.
     rv_name = mv_task_name.
-  ENDMETHOD.                    "GET_NAME
+  ENDMETHOD.
 
 
   METHOD receive.
-  ENDMETHOD.                    "RECEIVE
+  ENDMETHOD.
 
 
   METHOD receive_internal.
-    DATA:
-      lo_exception TYPE REF TO cx_dynamic_check.
-
     FIELD-SYMBOLS:
       <ls_task> TYPE zcl_bc_async_controller=>ty_task.
 
@@ -115,24 +129,20 @@ CLASS ZCL_BC_ASYNC_TASK_BASE IMPLEMENTATION.
     TRY.
         receive( ).
 
-      CATCH cx_dynamic_check INTO lo_exception.
-        " При исключении записываем текст ошибки
+      CATCH cx_dynamic_check INTO DATA(lo_exception).
         IF <ls_task> IS ASSIGNED.
-          <ls_task>-text = lo_exception->get_text( ).
           <ls_task>-exception = lo_exception.
         ENDIF.
     ENDTRY.
-
-  ENDMETHOD.                    "receive_internal
+  ENDMETHOD.
 
 
   METHOD start.
-  ENDMETHOD.                    "START
+  ENDMETHOD.
 
 
   METHOD start_internal.
     mr_task = ir_task.
-
-    start( ).
-  ENDMETHOD.                    "start_internal
+    check_rfc_exception( start( ) ).
+  ENDMETHOD.
 ENDCLASS.
