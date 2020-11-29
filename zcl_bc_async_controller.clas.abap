@@ -20,6 +20,7 @@ public section.
         end_time   TYPE timestampl,
         exception  TYPE REF TO cx_root,
         attempts   TYPE i,
+        rfcdest    TYPE rfcdes-rfcdest,
       END OF ty_task .
   types:
     tt_tasks TYPE STANDARD TABLE OF ty_task WITH DEFAULT KEY .

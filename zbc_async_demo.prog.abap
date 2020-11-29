@@ -60,7 +60,8 @@ START-OF-SELECTION.
   ULINE.
 
   LOOP AT gt_tasks ASSIGNING FIELD-SYMBOL(<ls_task>).
-    WRITE: / 'Task name: ',   <ls_task>-name(5) ,
+    WRITE: / 'Task name: ',   <ls_task>-name(5),
+             'RFC Dest: ',    <ls_task>-rfcdest,
              'Start time: ',  |{ <ls_task>-start_time TIMESTAMP = ENVIRONMENT }|,
              'End time: ' ,   |{ <ls_task>-end_time TIMESTAMP = ENVIRONMENT }|.
   ENDLOOP.

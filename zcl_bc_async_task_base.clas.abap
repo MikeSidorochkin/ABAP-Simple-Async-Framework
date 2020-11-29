@@ -56,10 +56,17 @@ CLASS ZCL_BC_ASYNC_TASK_BASE IMPLEMENTATION.
 
 
   METHOD check_rfc_exception.
+    FIELD-SYMBOLS:
+      <ls_task> TYPE zcl_bc_async_controller=>ty_task.
+
     CASE iv_subrc.
+      WHEN 0.
+        ASSIGN mr_task->* TO <ls_task>.
+        CALL FUNCTION 'SPBT_GET_PP_DESTINATION'
+          IMPORTING
+            rfcdest = <ls_task>-rfcdest.
       WHEN 1 OR 2.
         exclude_server( ).
-      WHEN 0.
       WHEN 3.
         RAISE EXCEPTION TYPE zcx_bc_async_no_resources
           EXPORTING
