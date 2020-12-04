@@ -237,10 +237,8 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
     DATA(lv_total_task_count) = lines( mt_tasks ).
 
     IF iv_message IS NOT INITIAL.
-      cl_akb_progress_indicator=>get_instance( )->display(
-        EXPORTING
-          total         = lv_total_task_count
-          message       = iv_message ).
+      cl_akb_progress_indicator=>get_instance( )->display( total   = lv_total_task_count
+                                                           message = iv_message ).
     ENDIF.
 
     WHILE lv_started_tasks <> lv_total_task_count.
@@ -261,10 +259,8 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           lv_started_tasks = lv_started_tasks + 1.
 
           IF iv_message IS NOT INITIAL.
-            cl_akb_progress_indicator=>get_instance( )->display(
-              EXPORTING
-                total         = lv_total_task_count
-                processed     = lv_started_tasks ).
+            cl_akb_progress_indicator=>get_instance( )->display( total     = lv_total_task_count
+                                                                 processed = lv_started_tasks ).
           ENDIF.
         CATCH zcx_bc_async_no_resources INTO DATA(lo_exception).
 
