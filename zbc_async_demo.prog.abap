@@ -22,6 +22,7 @@ CLASS lcl_task IMPLEMENTATION.
       STARTING NEW TASK mv_task_name
       DESTINATION IN GROUP mv_server_group
       CALLING receive_internal ON END OF TASK
+*      EXPORTING it_data = lt_demo_data " The demo scenario does not require data transfer
       EXCEPTIONS
         communication_failure = 1 MESSAGE ev_message
         system_failure        = 2 MESSAGE ev_message
@@ -32,6 +33,7 @@ CLASS lcl_task IMPLEMENTATION.
 
   METHOD receive.
     RECEIVE RESULTS FROM FUNCTION 'ZBC_PARALELL_TEST'.
+*      IMPORTING et_data = lt_demo_data " The demo scenario does not require data transfer
   ENDMETHOD.
 ENDCLASS.
 
@@ -48,7 +50,7 @@ START-OF-SELECTION.
                                                iv_name       = |{ sy-index }| ) ).
       ENDDO.
 
-      go_controller->start( ).
+      go_controller->start( 'Running asynchronous tasks...'(001) ).
     CATCH zcx_bc_async_base INTO DATA(go_exception).
       WRITE go_exception->get_text( ).
       STOP.

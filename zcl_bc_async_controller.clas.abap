@@ -40,6 +40,8 @@ public section.
       !IO_TASK type ref to ZCL_BC_ASYNC_TASK_BASE .
   methods CLEAR_TASKS .
   methods START
+    importing
+      !IV_MESSAGE type CSEQUENCE
     raising
       ZCX_BC_ASYNC_BASE .
   methods GET_TASKS
@@ -232,8 +234,16 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
     mv_running_tasks = 0.
     mv_finished_tasks = 0.
+    DATA(lv_total_task_count) = lines( mt_tasks ).
 
-    WHILE lv_started_tasks <> lines( mt_tasks ).
+    IF iv_message IS NOT INITIAL.
+      cl_akb_progress_indicator=>get_instance( )->display(
+        EXPORTING
+          total         = lv_total_task_count
+          message       = iv_message ).
+    ENDIF.
+
+    WHILE lv_started_tasks <> lv_total_task_count.
       IF mv_running_tasks >= mv_max_tasks AND mv_max_tasks IS NOT INITIAL.
         WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_running_tasks < mv_max_tasks.
       ENDIF.
@@ -249,6 +259,13 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           GET TIME STAMP FIELD <ls_task>-start_time.
           mv_running_tasks = mv_running_tasks + 1.
           lv_started_tasks = lv_started_tasks + 1.
+
+          IF iv_message IS NOT INITIAL.
+            cl_akb_progress_indicator=>get_instance( )->display(
+              EXPORTING
+                total         = lv_total_task_count
+                processed     = lv_started_tasks ).
+          ENDIF.
         CATCH zcx_bc_async_no_resources INTO DATA(lo_exception).
 
           WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_finished_tasks >= lv_started_tasks
@@ -275,6 +292,9 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
     ENDWHILE.
 
     WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_finished_tasks >= lv_started_tasks.
+    IF iv_message IS NOT INITIAL.
+      cl_akb_progress_indicator=>get_instance( )->last_message( ).
+    ENDIF.
   ENDMETHOD.
 
 

@@ -12,6 +12,12 @@
    </PROGDIR>
    <TPOOL>
     <item>
+     <ID>I</ID>
+     <KEY>001</KEY>
+     <ENTRY>Running asynchronous tasks...</ENTRY>
+     <LENGTH>52</LENGTH>
+    </item>
+    <item>
      <ID>R</ID>
      <ENTRY>Simple pRFC Demo</ENTRY>
      <LENGTH>16</LENGTH>
@@ -24,12 +30,6 @@
     </item>
     <item>
      <ID>S</ID>
-     <KEY>P_MAXTS</KEY>
-     <ENTRY>Maximum number of processes</ENTRY>
-     <LENGTH>37</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
      <KEY>P_PERC</KEY>
      <ENTRY>Maximum load percentage</ENTRY>
      <LENGTH>31</LENGTH>
@@ -39,12 +39,6 @@
      <KEY>P_S_GRP</KEY>
      <ENTRY>Server group (tr. RZ12)</ENTRY>
      <LENGTH>31</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_TOUT</KEY>
-     <ENTRY>Resource availability timeout</ENTRY>
-     <LENGTH>38</LENGTH>
     </item>
    </TPOOL>
   </asx:values>
