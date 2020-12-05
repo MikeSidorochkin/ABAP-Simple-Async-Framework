@@ -30,7 +30,7 @@ public section.
       !IT_SERVER_GROUPS type STRING_TABLE optional
       !IV_TIMEOUT type I default 60
       !IV_MAX_WPS type I optional
-      !IV_MAX_ATTEMPTS type I default 5
+      !IV_MAX_ATTEMPTS type I default 10
       !IV_MAX_PERCENT type I default 0
       !IV_RESERVED_WPS type I default 0
     raising
