@@ -1,0 +1,49 @@
+{
+  "global": {
+    "files": "/src/**/*.*",
+    "skipGeneratedGatewayClasses": true,
+    "skipGeneratedPersistentClasses": true,
+    "skipGeneratedFunctionGroups": true
+  },
+  "syntax": {
+    "version": "v702",
+    "errorNamespace": "^(Z|Y)"
+  },
+  "rules": {
+    "keyword_case": {
+      "style": "lower",
+      "ignoreExceptions": true,
+      "ignoreLowerClassImplmentationStatement": true,
+      "ignoreGlobalClassDefinition": false,
+      "ignoreGlobalInterface": false,
+      "ignoreFunctionModuleName": false
+    },
+    "line_length": {
+      "length": 80
+    },
+    "indentation": {
+      "ignoreExceptions": true,
+      "alignTryCatch": false,
+      "globalClassSkipFirst": false,
+      "ignoreGlobalClassDefinition": false,
+      "ignoreGlobalInterface": false
+    },
+    "obsolete_statement": {
+      "compute": true,
+      "subtract": true,
+      "add": true
+    },
+    "local_class_naming": {
+      "exception": "^LCL_.*$",
+      "local": "^LCL_.*$",
+      "test": "^LTCL_.*$"
+    },
+    "method_parameter_names": {
+      "ignoreExceptions": true,
+      "importing": "^I._.*$",
+      "returning": "^R._.*$",
+      "changing": "^C._.*$",
+      "exporting": "^E._.*$"
+    }    
+  }
+}
