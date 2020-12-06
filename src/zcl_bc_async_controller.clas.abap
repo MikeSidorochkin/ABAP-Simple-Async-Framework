@@ -237,8 +237,8 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
     DATA(lv_total_task_count) = lines( mt_tasks ).
 
     IF iv_message IS NOT INITIAL.
-      cl_akb_progress_indicator=>get_instance( )->display( total   = lv_total_task_count
-                                                           message = iv_message ).
+      cl_akb_progress_indicator=>get_instance(: )->stack_message( ),
+                                                )->set_message( im_message = iv_message ).
     ENDIF.
 
     WHILE lv_started_tasks <> lv_total_task_count.
