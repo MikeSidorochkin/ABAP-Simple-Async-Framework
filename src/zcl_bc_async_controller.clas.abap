@@ -33,6 +33,7 @@ public section.
       !IV_MAX_ATTEMPTS type I default 10
       !IV_MAX_PERCENT type I default 0
       !IV_RESERVED_WPS type I default 0
+      !IV_MIN_WPS TYPE i default 0
     raising
       ZCX_BC_ASYNC_BASE .
   methods ADD_TASK
@@ -170,6 +171,12 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
     ENDIF.
 
     IF mv_max_tasks <= 0.
+      RAISE EXCEPTION TYPE zcx_bc_async_base
+        EXPORTING
+          textid = zcx_bc_async_base=>resource_error.
+    ENDIF.
+    
+    IF iv_min_wps IS NOT INITIAL AND mv_max_tasks < iv_min_wps.
       RAISE EXCEPTION TYPE zcx_bc_async_base
         EXPORTING
           textid = zcx_bc_async_base=>resource_error.
