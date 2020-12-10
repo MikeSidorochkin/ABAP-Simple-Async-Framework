@@ -29,7 +29,6 @@ public section.
     importing
       !IT_SERVER_GROUPS type STRING_TABLE optional
       !IV_TIMEOUT type I default 60
-      !IV_MAX_WPS type I optional
       !IV_MAX_ATTEMPTS type I default 10
       !IV_MAX_PERCENT type I default 0
       !IV_RESERVED_WPS type I default 0
@@ -162,10 +161,8 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
     DATA(lv_unused_wps) = COND i( WHEN iv_reserved_wps IS NOT INITIAL THEN iv_reserved_wps ELSE 5 ).
     DATA(lv_max_safe_wps) = nmax( val1 = ( lv_free_wps / 2 ) val2 = ( lv_free_wps - lv_unused_wps ) ).
 
-    IF iv_max_wps IS NOT INITIAL.
-      mv_max_tasks = iv_max_wps - lv_unused_wps.
-    ELSEIF iv_max_percent BETWEEN 1 AND 100.
-      mv_max_tasks = round( val = ( lv_free_wps / 100 ) * iv_max_percent dec = 0 mode = cl_abap_math=>round_down ) - lv_unused_wps.
+    iv_max_percent BETWEEN 1 AND 100.
+      mv_max_tasks = round( val = ( lv_free_wps / 100 ) * iv_max_percent dec = 0 mode = cl_abap_math=>round_up ) - lv_unused_wps.
     ELSE.
       mv_max_tasks = lv_max_safe_wps.
     ENDIF.
