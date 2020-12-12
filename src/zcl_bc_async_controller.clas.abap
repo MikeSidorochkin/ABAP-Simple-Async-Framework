@@ -158,7 +158,9 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
     mv_server_group = <lv_server_group>.
 
-    DATA(lv_unused_wps) = COND i( WHEN iv_reserved_wps IS NOT INITIAL THEN iv_reserved_wps ELSE 1 ).
+    DATA(lv_unused_wps) = COND i( WHEN iv_reserved_wps IS NOT INITIAL THEN iv_reserved_wps
+                                  ELSE round( val = ( lv_free_wps / 100 ) * 5 dec = 0 mode = cl_abap_math=>round_up ) ).
+
     DATA(lv_max_safe_wps) = nmax( val1 = ( lv_free_wps / 2 ) val2 = ( lv_free_wps - lv_unused_wps ) ).
 
     IF iv_max_percent BETWEEN 1 AND 100.
