@@ -158,7 +158,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
     mv_server_group = <lv_server_group>.
 
-    DATA(lv_unused_wps) = COND i( WHEN iv_reserved_wps IS NOT INITIAL THEN iv_reserved_wps ELSE 5 ).
+    DATA(lv_unused_wps) = COND i( WHEN iv_reserved_wps IS NOT INITIAL THEN iv_reserved_wps ELSE 1 ).
     DATA(lv_max_safe_wps) = nmax( val1 = ( lv_free_wps / 2 ) val2 = ( lv_free_wps - lv_unused_wps ) ).
 
     IF iv_max_percent BETWEEN 1 AND 100.
@@ -172,7 +172,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
         EXPORTING
           textid = zcx_bc_async_base=>resource_error.
     ENDIF.
-    
+
     IF iv_min_wps IS NOT INITIAL AND mv_max_tasks < iv_min_wps.
       RAISE EXCEPTION TYPE zcx_bc_async_base
         EXPORTING
