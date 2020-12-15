@@ -29,10 +29,12 @@ public section.
     importing
       !IT_SERVER_GROUPS type STRING_TABLE optional
       !IV_TIMEOUT type I default 60
+      !IV_MAX_WPS type I optional
       !IV_MAX_ATTEMPTS type I default 10
       !IV_MAX_PERCENT type I default 0
       !IV_RESERVED_WPS type I default 0
-      !IV_MIN_WPS TYPE i default 0
+      !IV_MIN_WPS type I optional
+      !IV_EXCLUDE_SERVERS_WITH_ERRORS type ABAP_BOOL default ABAP_TRUE
     raising
       ZCX_BC_ASYNC_BASE .
   methods ADD_TASK
@@ -50,6 +52,9 @@ public section.
   methods GET_GROUP
     returning
       value(RV_GROUP) type RZLLITAB-CLASSNAME .
+  methods IS_NEED_TO_EXCLUDE_SERVERS
+    returning
+      value(RV_EXCLUDE) type ABAP_BOOL .
   PROTECTED SECTION.
     DATA mt_tasks TYPE tt_tasks .
 private section.
@@ -60,6 +65,13 @@ private section.
   data MV_TASK_TIMEOUT type I .
   data MV_MAX_TASKS type DECFLOAT16 .
   data MV_MAX_ATTEMPTS type I .
+  constants:
+    BEGIN OF gc_rfc_errors,
+      communication_failure TYPE sysubrc VALUE 1,
+      system_failure        TYPE sysubrc VALUE 2,
+      resource_failure      TYPE sysubrc VALUE 3,
+    END OF gc_rfc_errors .
+  data MV_EXCLUDE_SERVERS_WITH_ERRORS type ABAP_BOOL .
 
   methods SKIP_TASK
     importing
@@ -97,6 +109,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
           lv_group_index   TYPE i.
 
     mv_max_attempts = iv_max_attempts.
+    mv_exclude_servers_with_errors = iv_exclude_servers_with_errors.
     mv_task_timeout = iv_timeout.
 
     lt_server_groups = it_server_groups.
@@ -158,13 +171,13 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
     mv_server_group = <lv_server_group>.
 
-    DATA(lv_unused_wps) = COND i( WHEN iv_reserved_wps IS NOT INITIAL THEN iv_reserved_wps
-                                  ELSE round( val = ( lv_free_wps / 100 ) * 5 dec = 0 mode = cl_abap_math=>round_up ) ).
-
+    DATA(lv_unused_wps) = COND i( WHEN iv_reserved_wps IS NOT INITIAL THEN iv_reserved_wps ELSE 1 ).
     DATA(lv_max_safe_wps) = nmax( val1 = ( lv_free_wps / 2 ) val2 = ( lv_free_wps - lv_unused_wps ) ).
 
-    IF iv_max_percent BETWEEN 1 AND 100.
-      mv_max_tasks = round( val = ( lv_free_wps / 100 ) * iv_max_percent dec = 0 mode = cl_abap_math=>round_up ) - lv_unused_wps.
+    IF iv_max_wps IS NOT INITIAL.
+      mv_max_tasks = iv_max_wps - lv_unused_wps.
+    ELSEIF iv_max_percent BETWEEN 1 AND 100.
+      mv_max_tasks = round( val = ( lv_free_wps / 100 ) * iv_max_percent dec = 0 mode = cl_abap_math=>round_down ) - lv_unused_wps.
     ELSE.
       mv_max_tasks = lv_max_safe_wps.
     ENDIF.
@@ -178,7 +191,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
     IF iv_min_wps IS NOT INITIAL AND mv_max_tasks < iv_min_wps.
       RAISE EXCEPTION TYPE zcx_bc_async_base
         EXPORTING
-          textid = zcx_bc_async_base=>resource_error.
+          textid = zcx_bc_async_base=>min_wps_resource_error.
     ENDIF.
 
   ENDMETHOD.
@@ -205,6 +218,11 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
   ENDMETHOD.
 
 
+  METHOD is_need_to_exclude_servers.
+    rv_exclude = mv_exclude_servers_with_errors.
+  ENDMETHOD.
+
+
   METHOD skip_task.
     GET TIME STAMP FIELD cs_task-start_time.
     GET TIME STAMP FIELD cs_task-end_time.
@@ -212,18 +230,18 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
     IF iv_timeout = abap_true.
       TRY.
-          RAISE EXCEPTION TYPE zcx_bc_async_no_resources
+          RAISE EXCEPTION TYPE zcx_bc_async_rfc_error
             EXPORTING
-              textid = zcx_bc_async_no_resources=>timeout.
+              textid = zcx_bc_async_rfc_error=>timeout.
         CATCH cx_root INTO cs_task-exception.
       ENDTRY.
     ENDIF.
 
     IF iv_attempts_exceeded = abap_true.
       TRY.
-          RAISE EXCEPTION TYPE zcx_bc_async_no_resources
+          RAISE EXCEPTION TYPE zcx_bc_async_rfc_error
             EXPORTING
-              textid = zcx_bc_async_no_resources=>attempts_exceeded.
+              textid = zcx_bc_async_rfc_error=>attempts_exceeded.
         CATCH cx_root INTO cs_task-exception.
       ENDTRY.
     ENDIF.
@@ -249,7 +267,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
     WHILE lv_started_tasks <> lv_total_task_count.
       IF mv_running_tasks >= mv_max_tasks AND mv_max_tasks IS NOT INITIAL.
-        WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_running_tasks < mv_max_tasks.
+        WAIT UNTIL mv_running_tasks < mv_max_tasks.
       ENDIF.
 
       DATA(lr_task) = get_next_task( ).
@@ -268,23 +286,24 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
             cl_akb_progress_indicator=>get_instance( )->display( total     = lv_total_task_count
                                                                  processed = lv_started_tasks ).
           ENDIF.
-        CATCH zcx_bc_async_no_resources INTO DATA(lo_exception).
+        CATCH zcx_bc_async_rfc_error INTO DATA(lo_exception).
 
-          WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_finished_tasks >= lv_started_tasks
-               UP TO mv_task_timeout SECONDS.
+          WAIT UNTIL mv_finished_tasks >= lv_started_tasks
+            UP TO mv_task_timeout SECONDS.
 
           IF sy-subrc = 0.
             <ls_task>-attempts = <ls_task>-attempts + 1.
             IF <ls_task>-attempts >= mv_max_attempts.
+              lv_started_tasks = lv_started_tasks + 1.
+
               skip_task( EXPORTING iv_attempts_exceeded = abap_true
                          CHANGING cs_task = <ls_task> ).
-
-              lv_started_tasks = lv_started_tasks + 1.
             ENDIF.
           ELSE.
+            lv_started_tasks = lv_started_tasks + 1.
+
             skip_task( EXPORTING iv_timeout = abap_true
                        CHANGING cs_task = <ls_task> ).
-            lv_started_tasks = lv_started_tasks + 1.
           ENDIF.
 
         CATCH cx_root INTO <ls_task>-exception.
@@ -293,7 +312,7 @@ CLASS ZCL_BC_ASYNC_CONTROLLER IMPLEMENTATION.
 
     ENDWHILE.
 
-    WAIT FOR ASYNCHRONOUS TASKS UNTIL mv_finished_tasks >= lv_started_tasks.
+    WAIT UNTIL mv_finished_tasks >= lv_started_tasks.
     IF iv_message IS NOT INITIAL.
       cl_akb_progress_indicator=>get_instance( )->last_message( ).
     ENDIF.

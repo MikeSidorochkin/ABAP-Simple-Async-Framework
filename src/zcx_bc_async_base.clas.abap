@@ -53,6 +53,15 @@ public section.
       attr3 type scx_attrname value '',
       attr4 type scx_attrname value '',
     end of INITIALIZATION_ERROR .
+  constants:
+    begin of MIN_WPS_RESOURCE_ERROR,
+      msgid type symsgid value 'ZBC_ASYNC',
+      msgno type symsgno value '009',
+      attr1 type scx_attrname value '',
+      attr2 type scx_attrname value '',
+      attr3 type scx_attrname value '',
+      attr4 type scx_attrname value '',
+    end of MIN_WPS_RESOURCE_ERROR .
   data MV_GROUP type RZLLITAB-CLASSNAME .
 
   methods CONSTRUCTOR

@@ -5,7 +5,7 @@
    <T100A>
     <ARBGB>ZBC_ASYNC</ARBGB>
     <MASTERLANG>E</MASTERLANG>
-    <STEXT>pRFC Messages</STEXT>
+    <STEXT>pRFC Сообщения</STEXT>
    </T100A>
    <T100>
     <T100>
@@ -63,6 +63,63 @@
      <TEXT>Number of attempts exceeded</TEXT>
     </T100>
    </T100>
+   <I18N_LANGS>
+    <LANGU>R</LANGU>
+   </I18N_LANGS>
+   <T100T>
+    <T100T>
+     <SPRSL>R</SPRSL>
+     <ARBGB>ZBC_ASYNC</ARBGB>
+     <STEXT>pRFC Сообщения</STEXT>
+    </T100T>
+   </T100T>
+   <T100_TEXTS>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>pRFC модуль не запущен</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>pRFC группа не найдена</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Ошибка инициализации pRFC</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Нет свободных ресурсов</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Ошибочное имя группы</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Контроллер не задан</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Ошибка запуска RFC модуля: &amp;1</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>007</MSGNR>
+     <TEXT>Таймаут ожидания ресурса</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>008</MSGNR>
+     <TEXT>Превышено число ожидания ресурсов</TEXT>
+    </item>
+   </T100_TEXTS>
   </asx:values>
  </asx:abap>
 </abapGit>

@@ -17,6 +17,7 @@ PARAMETERS:
   p_calls TYPE i DEFAULT 20.
 
 CLASS lcl_task IMPLEMENTATION.
+
   METHOD start.
     CALL FUNCTION 'ZBC_PARALELL_TEST'
       STARTING NEW TASK mv_task_name
@@ -24,15 +25,20 @@ CLASS lcl_task IMPLEMENTATION.
       CALLING receive_internal ON END OF TASK
 *      EXPORTING it_data = lt_demo_data " The demo scenario does not require data transfer
       EXCEPTIONS
-        communication_failure = 1 MESSAGE ev_message
-        system_failure        = 2 MESSAGE ev_message
-        resource_failure      = 3
+        communication_failure = zcl_bc_async_controller=>gc_rfc_errors-communication_failure MESSAGE ev_message
+        system_failure        = zcl_bc_async_controller=>gc_rfc_errors-system_failure        MESSAGE ev_message
+        resource_failure      = zcl_bc_async_controller=>gc_rfc_errors-resource_failure
         OTHERS                = 4.
     ev_subrc = sy-subrc.
   ENDMETHOD.
 
   METHOD receive.
-    RECEIVE RESULTS FROM FUNCTION 'ZBC_PARALELL_TEST'.
+    RECEIVE RESULTS FROM FUNCTION 'ZBC_PARALELL_TEST'
+      EXCEPTIONS
+        communication_failure = zcl_bc_async_controller=>gc_rfc_errors-communication_failure MESSAGE ev_message
+        system_failure        = zcl_bc_async_controller=>gc_rfc_errors-system_failure        MESSAGE ev_message.
+
+    ev_subrc = sy-subrc.
 *      IMPORTING et_data = lt_demo_data " The demo scenario does not require data transfer
   ENDMETHOD.
 ENDCLASS.
@@ -65,7 +71,8 @@ START-OF-SELECTION.
     WRITE: / 'Task name: ',   <ls_task>-name(5),
              'RFC Dest: ',    <ls_task>-rfcdest,
              'Start time: ',  |{ <ls_task>-start_time TIMESTAMP = ENVIRONMENT }|,
-             'End time: ' ,   |{ <ls_task>-end_time TIMESTAMP = ENVIRONMENT }|.
+             'End time: ' ,   |{ <ls_task>-end_time TIMESTAMP = ENVIRONMENT }|,
+             'Error: ',       COND string( WHEN <ls_task>-exception IS BOUND THEN <ls_task>-exception->get_text( ) ELSE `-` ).
   ENDLOOP.
 
   ULINE.
